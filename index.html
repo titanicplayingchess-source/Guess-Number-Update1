@@ -27,7 +27,7 @@
         .big-rainbow {
             font-size: 50px;
             font-weight: bold;
-            background: linear-gradient(270deg, red, orange, yellow, green, cyan, blue, violet);
+            background: linear-gradient(270deg, red, orange, yellow, green, blue, indigo, violet);
             background-size: 400% 400%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -38,7 +38,7 @@
         .small-rainbow {
             font-size: 30px;
             font-weight: bold;
-            background: linear-gradient(270deg, red, orange, yellow, green, cyan, blue, violet);
+            background: linear-gradient(270deg, red, orange, yellow, green, blue, indigo, violet);
             background-size: 400% 400%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -46,6 +46,17 @@
             margin: 20px 0;
         }
         
+		.blink-text {
+			color: #00ff00;
+			font-size: 20px;
+			animation: blink 1s infinite;
+		}
+		@keyframes blink {
+			o% { opacity: 1; }
+			50% { opacity: 0; }
+			100% { opacity: 1; }
+		}
+		
         @keyframes rainbowFlow {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -151,6 +162,8 @@
     <div class="game-container">
         <h1 class="big-rainbow">Lucky Number Guessing Game</h1>
         <p class="small-rainbow">Creator: Tommy Tran a.k.a Khang</p>
+		<p class="blink-text">This game is in beta period so it may contain bugs! If you see bugs in game, please contact to us through gmail (titanciplayingchess@gmail.com). Thank you</p>
+		<p class="small-rainbow">I hope you enjoy my game. Love all🥀</p>
         
         <div class="stats">
             <div class="stat-box">
