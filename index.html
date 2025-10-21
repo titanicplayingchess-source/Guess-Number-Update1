@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Lucky Number Guessing Game</title>
+    <style>
+        body {
+            background-color: green;
+            font-family: Bahnschrift;
+            margin: 0;
+            padding: 50px;
+            min-height: 100vh;
+            text-align: center;
+        }
+        
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            margin: 50px auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .big-rainbow {
+            font-size: 50px;
+            font-weight: bold;
+            background: linear-gradient(270deg, red, orange, yellow, green, cyan, blue, violet);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbowFlow 4s ease infinite;
+            margin: 20px 0;
+        }
+        
+        .small-rainbow {
+            font-size: 30px;
+            font-weight: bold;
+            background: linear-gradient(270deg, red, orange, yellow, green, cyan, blue, violet);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbowFlow 4s ease infinite;
+            margin: 20px 0;
+        }
+        
+        @keyframes rainbowFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            font-size: 1.1em;
+            color: white;
+        }
+        
+        .stat-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 10px 20px;
+            border-radius: 10px;
+            min-width: 100px;
+        }
+        
+        .input-area {
+            margin: 25px 0;
+        }
+        
+        input[type="number"] {
+            padding: 15px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 50px;
+            width: 120px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        button {
+            background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s;
+        }
+        
+        .hint-button {
+            background: linear-gradient(45deg, #00b09b, #96c93d);
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+        
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        #result {
+            font-size: 1.3em;
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            min-height: 30px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .hint-counter {
+            font-size: 0.9em;
+            margin-top: 5px;
+            color: #ffcc00;
+        }
+        
+        .loser-message {
+            background: rgba(255, 0, 0, 0.3);
+            color: #ff4444;
+            font-size: 1.5em;
+            text-shadow: 0 0 10px red;
+        }
+        
+        @keyframes celebrate {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .celebrate {
+            animation: celebrate 0.5s ease-in-out 3;
+            color: #FFD700;
+            text-shadow: 0 0 10px #FFD700;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="big-rainbow">Lucky Number Guessing Game</h1>
+        <p class="small-rainbow">Creator: Tommy Tran a.k.a Khang</p>
+        
+        <div class="stats">
+            <div class="stat-box">
+                <div>🎯 Try</div>
+                <div id="attempts">0</div>
+            </div>
+            <div class="stat-box">
+                <div>📊 Score</div>
+                <div id="score">100</div>
+            </div>
+            <div class="stat-box">
+                <div>💡 Hint Left</div>
+                <div id="hintCount">3</div>
+            </div>
+        </div>
+        
+        <div class="input-area">
+            <input type="number" id="guessInput" min="1" max="100" placeholder="1-100">
+            <br>
+            <button onclick="checkGuess()">🚀 GUESS</button>
+            <button onclick="newGame()">🔁 Play again</button>
+            <button class="hint-button" onclick="useHint()">💡 HINT (-20 score)</button>
+            <div class="hint-counter" id="hintCounter">Each hint gives different information!</div>
+        </div>
+        
+        <div id="result">Hello Player! Let's Guess a number from 1 to 100</div>
+    </div>
+    
+    <script>
+        let secretNumber;
+        let attempts;
+        let score;
+        let gameActive;
+        let hintUsed;
+        
+        function newGame() {
+            secretNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            score = 100;
+            gameActive = true;
+            hintUsed = 0;
+            updateDisplay();
+            document.getElementById('result').innerHTML = '🎯 New game! Guess a number from 1 to 100';
+            document.getElementById('result').className = '';
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guessInput').focus();
+            enableButtons();
+        }
+        
+        function checkGuess() {
+            if (!gameActive) return;
+            
+            const input = document.getElementById('guessInput');
+            const userGuess = parseInt(input.value);
+            const resultDiv = document.getElementById('result');
+            
+            if (!userGuess || userGuess < 1 || userGuess > 100) {
+                resultDiv.innerHTML = '❌ Please enter number from 1 to 100!';
+                return;
+            }
+            
+            attempts++;
+            score = Math.max(0, score - 2);
+            
+            if (userGuess === secretNumber) {
+                resultDiv.innerHTML = `🎉 YAY! Correct number is ${secretNumber}!<br>
+                                      🏆 You guessed right after ${attempts} attempts!<br>
+                                      💯 Score: ${score}`;
+                resultDiv.className = 'celebrate';
+                gameActive = false;
+            } else {
+                resultDiv.innerHTML = `❌ Wrong! Try again!<br>
+                                      🔥 Attempts: ${attempts} | -2 score`;
+                
+                if (score <= 0) {
+                    endGame();
+                }
+            }
+            
+            updateDisplay();
+            input.value = '';
+            input.focus();
+        }
+        
+        function useHint() {
+            if (!gameActive) return;
+            
+            if (hintUsed >= 3) {
+                document.getElementById('result').innerHTML = '❌ No more hints available!';
+                return;
+            }
+            
+            if (score >= 20) {
+                score -= 20;
+                hintUsed++;
+                
+                let hintMessage = '';
+                if (hintUsed === 1) {
+                    const lowerBound = Math.max(1, secretNumber - 35);
+                    const upperBound = Math.min(100, secretNumber + 35);
+                    hintMessage = `💡 HINT 1: Number is between ${lowerBound}-${upperBound}`;
+                } else if (hintUsed === 2) {
+                    const lowerBound = Math.max(1, secretNumber - 15);
+                    const upperBound = Math.min(100, secretNumber + 15);
+                    hintMessage = `💡 HINT 2: Number is between ${lowerBound}-${upperBound}`;
+                } else if (hintUsed === 3) {
+                    const isEven = secretNumber % 2 === 0;
+                    const isPrime = checkPrime(secretNumber);
+                    hintMessage = `💡 HINT 3: Number is ${isEven ? 'even' : 'odd'}${isPrime ? ' and prime' : ''}`;
+                }
+                
+                document.getElementById('result').innerHTML = hintMessage;
+                updateDisplay();
+                
+                if (score <= 0) {
+                    endGame();
+                }
+            } else {
+                document.getElementById('result').innerHTML = '❌ Not enough score for hint!';
+            }
+        }
+        
+        function checkPrime(num) {
+            if (num < 2) return false;
+            for (let i = 2; i <= Math.sqrt(num); i++) {
+                if (num % i === 0) return false;
+            }
+            return true;
+        }
+        
+        function endGame() {
+            document.getElementById('result').innerHTML = '💀 YOU LOSER! GET BETTER NOOB!<br>🔥 The number was: ' + secretNumber;
+            document.getElementById('result').className = 'loser-message';
+            gameActive = false;
+            disableButtons();
+        }
+        
+        function disableButtons() {
+            document.querySelector('button[onclick="checkGuess()"]').disabled = true;
+            document.querySelector('.hint-button').disabled = true;
+        }
+        
+        function enableButtons() {
+            document.querySelector('button[onclick="checkGuess()"]').disabled = false;
+            document.querySelector('.hint-button').disabled = false;
+        }
+        
+        function updateDisplay() {
+            document.getElementById('attempts').textContent = attempts;
+            document.getElementById('score').textContent = score;
+            document.getElementById('hintCount').textContent = 3 - hintUsed;
+        }
+        
+        document.getElementById('guessInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && gameActive) {
+                checkGuess();
+            }
+        });
+        
+        window.onload = newGame;
+    </script>
+</body>
+</html>
